@@ -1,0 +1,12 @@
+#OS Junk Files
+[Tt]humbs.db
+*.DS_Store
+
+#SQL Password
+./password.php
+
+#Backup
+./backups/
+./backup.sh
+
+#Other Files
