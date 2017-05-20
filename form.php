@@ -5,13 +5,12 @@ include 'password.php';
 if(isset($_POST['submit'])) {
 
     $err = FALSE;
-	$message = '';
+    $message = '';
     $target_path = '';
 
     $servername = 'localhost';
     $username = 'www';
     $dbname = 'robotics'; 
-#    $password = 'gfFIw{NHpwCF67';
 
     $conn = new mysqli($servername, $username, $password, $dbname);
 
