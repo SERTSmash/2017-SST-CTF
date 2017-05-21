@@ -52,23 +52,28 @@ if(isset($_POST['submit'])) {
                 default:
                     throw new RuntimeException('An error has occured.');
             }
-            if ($_FILES['file']['size'] > 5000000) {
-                throw new RuntimeException('Exceeded filesize limit.');
-            }
-            $target_path = 'img/upload/'.time().'_'.basename($_FILES['file']['name']);
+#            if ($_FILES['file']['size'] > 10000000) {
+#                throw new RuntimeException('Exceeded filesize limit.');
+#            }
+            $file_name = time().'_'.basename($_FILES['file']['name']);
+            $target_path = 'img/upload/'.$file_name;
             $finfo = new finfo(FILEINFO_MIME_TYPE);
             if (false === $ext = array_search(
-                $finfo->file($_FILES['file']['tmp_name']),
+                strtolower($finfo->file($_FILES['file']['tmp_name'])),
                 array(
                     '.png' => 'image/png',
+                    '.PNG' => 'image/PNG',
                     '.jpg' => 'image/jpeg',
                     '.jpeg' => 'image/jpeg',
+                    '.JPG' => 'image/jpeg',
+                    '.JPEG' => 'image/jpeg',
                 ),
                 true
             )) {
                 throw new RuntimeException('Only .png and jpeg files can be uploaded');
             }
             if (move_uploaded_file($_FILES['file']['tmp_name'], $target_path)) {
+                exec("convert -define jpeg:size=200x200 $target_path -thumbnail 390x290^ -gravity center -extent 390x290 $target_path");
                 $message = basename($_FILES['file']['name'])." has been uploaded.";
             } else {
                 throw new RuntimeException('Failed to move file');
@@ -79,6 +84,7 @@ if(isset($_POST['submit'])) {
     } catch (RuntimeException $e) {
         $err = TRUE;
         $message = $e->getMessage();
+        echo $message;
     } 
 
     $sql = "INSERT INTO pit_scout (name, number, leaders, strengths, weaknesses, notes, image) VALUES ('$name', '$number', '$leaders', '$strengths', '$weaknesses', '$notes', '$target_path')";
@@ -109,20 +115,17 @@ if(isset($_POST['submit'])) {
       <textarea placeholder="List Leaders" name="leaders" tabindex="3"></textarea>
     </fieldset>
     <fieldset>
-      <textarea placeholder="Leader Comments" name="comments" tabindex="4"></textarea>
+      <textarea placeholder="Robot Strengths" name="strengths" tabindex="4"></textarea>
     </fieldset>
     <fieldset>
-      <textarea placeholder="Robot Strengths" name="strengths" tabindex="5"></textarea>
+      <textarea placeholder="Robot Weaknesses" name="weaknesses" tabindex="5"></textarea>
     </fieldset>
     <fieldset>
-      <textarea placeholder="Robot Weaknesses" name="weaknesses" tabindex="6"></textarea>
-    </fieldset>
-    <fieldset>
-      <textarea placeholder="Other Notes" name="notes" tabindex="7"></textarea>
+      <textarea placeholder="Other Notes" name="notes" tabindex="6"></textarea>
     </fieldset>
     <fieldset>
       <p><b>Robot Image (png/jpg)</b></p>
-      <input name="file" type="file" tabindex="8" accept="image/*" required>
+      <input name="file" type="file" tabindex="7" accept="image/*" required>
     </fieldset>
     <fieldset>
       <button name="submit" type="submit" id="contact-submit" data-submit="...Sending">Submit</button>
